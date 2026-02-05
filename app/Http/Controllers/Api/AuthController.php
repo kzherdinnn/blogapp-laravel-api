@@ -69,26 +69,63 @@ class AuthController extends Controller
 
     // this function saves user name,lastname and photo
     public function saveUserInfo(Request $request){
-        $user = User::find(Auth::user()->id);
-        $user->name = $request->name;
-        $user->lastname = $request->lastname;
-        $photo = '';
-        //check if user provided photo
-        if($request->photo!=''){
-            // user time for photo name to prevent name duplication
-            $photo = time().'.jpg';
-            // decode photo string and save to storage/profiles
-            file_put_contents('storage/profiles/'.$photo,base64_decode($request->photo));
-            $user->photo = $photo;
+        try {
+            // Validate request
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'lastname' => 'required|string|max:255',
+                'photo' => 'nullable|string'
+            ]);
+
+            $user = User::find(Auth::user()->id);
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not found'
+                ], 404);
+            }
+
+            $user->name = $request->name;
+            $user->lastname = $request->lastname;
+            $photo = '';
+            
+            //check if user provided photo
+            if($request->photo && $request->photo != ''){
+                // Create storage/profiles directory if it doesn't exist
+                $profilesPath = storage_path('app/public/profiles');
+                if (!file_exists($profilesPath)) {
+                    mkdir($profilesPath, 0755, true);
+                }
+
+                // user time for photo name to prevent name duplication
+                $photo = time().'.jpg';
+                // decode photo string and save to storage/profiles
+                file_put_contents($profilesPath.'/'.$photo, base64_decode($request->photo));
+                $user->photo = $photo;
+            }
+
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User info updated successfully',
+                'photo' => $photo,
+                'user' => $user
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422);
+        } catch(Exception $e){
+            return response()->json([
+                'success' => false,
+                'message' => 'Error saving user info: '.$e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $user->update();
-
-        return response()->json([
-            'success' => true,
-            'photo' => $photo
-        ]);
-       
     }
 
 
