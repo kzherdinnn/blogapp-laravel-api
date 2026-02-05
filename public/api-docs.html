@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog API Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .endpoint {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .endpoint:last-child {
+            border-bottom: none;
+        }
+
+        .endpoint-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .method {
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+
+        .method.post {
+            background: #10b981;
+            color: white;
+        }
+
+        .method.get {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .method.put {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .method.delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .url {
+            font-family: 'Courier New', monospace;
+            background: #f3f4f6;
+            padding: 8px 12px;
+            border-radius: 5px;
+            flex: 1;
+            font-size: 0.9em;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .code-block {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge.auth {
+            background: #fbbf24;
+            color: #78350f;
+        }
+
+        .badge.public {
+            background: #10b981;
+            color: white;
+        }
+
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .test-button:hover {
+            background: #5568d3;
+        }
+
+        .response-area {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 10px;
+            display: none;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+
+        .token-display {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            word-break: break-all;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .info-box h3 {
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            color: #1e3a8a;
+        }
+
+        .info-box li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Blog API Tester</h1>
+            <p>Server: <strong>http://127.0.0.1:8000</strong></p>
+        </div>
+
+        <div class="card">
+            <div class="info-box">
+                <h3>📝 Quick Start Guide</h3>
+                <ul>
+                    <li>Server Laravel sudah berjalan di <code>http://127.0.0.1:8000</code></li>
+                    <li>Gunakan tools seperti <strong>Postman</strong>, <strong>Thunder Client</strong>, atau <strong>cURL</strong> untuk testing</li>
+                    <li>Mulai dengan <strong>Register</strong> → <strong>Login</strong> → Dapatkan <strong>Token</strong> → Test endpoints lainnya</li>
+                    <li>Token JWT harus disertakan di header <code>Authorization: Bearer {token}</code> untuk endpoint yang dilindungi</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Public Endpoints -->
+        <div class="card">
+            <h2 class="section-title">🔓 Public Endpoints</h2>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/register</span>
+                    <span class="badge public">PUBLIC</span>
+                </div>
+                <p class="description">Mendaftarkan user baru</p>
+                <div class="code-block">
+curl -X POST http://127.0.0.1:8000/api/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "password_confirmation": "password123"
+  }'
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/login</span>
+                    <span class="badge public">PUBLIC</span>
+                </div>
+                <p class="description">Login dan mendapatkan JWT token</p>
+                <div class="code-block">
+curl -X POST http://127.0.0.1:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "password123"
+  }'
+                </div>
+                <div class="token-display" style="margin-top: 10px;">
+                    <strong>Response akan berisi:</strong><br>
+                    { "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...", "token_type": "bearer", "expires_in": 3600 }
+                </div>
+            </div>
+        </div>
+
+        <!-- Post Endpoints -->
+        <div class="card">
+            <h2 class="section-title">📝 Post Endpoints</h2>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/posts/</span>
+                    <span class="badge auth">AUTH REQUIRED</span>
+                </div>
+                <p class="description">Mendapatkan semua posts</p>
+                <div class="code-block">
+curl -X GET http://127.0.0.1:8000/api/posts/ \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/posts/my_posts</span>
+                    <span class="badge auth">AUTH REQUIRED</span>
+                </div>
+                <p class="description">Mendapatkan posts milik user yang sedang login</p>
+                <div class="code-block">
+curl -X GET http://127.0.0.1:8000/api/posts/my_posts \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/posts/create</span>
+                    <span class="badge auth">AUTH REQUIRED</span>
+                </div>
+                <p class="description">Membuat post baru</p>
+                <div class="code-block">
+curl -X POST http://127.0.0.1:8000/api/posts/create \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{
+    "title": "My First Blog Post",
+    "body": "This is the content of my blog post..."
+  }'
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/posts/posts/{id}</span>
+                    <span class="badge auth">AUTH REQUIRED</span>
+                </div>
+                <p class="description">Update post berdasarkan ID</p>
+                <div class="code-block">
+curl -X POST http://127.0.0.1:8000/api/posts/posts/1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{
+    "title": "Updated Title",
+    "body": "Updated content..."
+  }'
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method delete">DELETE</span>
+                    <span class="url">/api/posts/{id}</span>
+                    <span class="badge auth">AUTH REQUIRED</span>
+                </div>
+                <p class="description">Hapus post berdasarkan ID</p>
+                <div class="code-block">
+curl -X DELETE http://127.0.0.1:8000/api/posts/1 \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/posts/like</span>
+                    <span class="badge auth">AUTH REQUIRED</span>
+                </div>
+                <p class="description">Like/Unlike post</p>
+                <div class="code-block">
+curl -X POST http://127.0.0.1:8000/api/posts/like \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{
+    "post_id": 1
+  }'
+                </div>
+            </div>
+        </div>
+
+        <!-- Comment Endpoints -->
+        <div class="card">
+            <h2 class="section-title">💬 Comment Endpoints</h2>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/posts/comments</span>
+                    <span class="badge auth">AUTH REQUIRED</span>
+                </div>
+                <p class="description">Mendapatkan comments untuk sebuah post</p>
+                <div class="code-block">
+curl -X POST http://127.0.0.1:8000/api/posts/comments \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{
+    "post_id": 1
+  }'
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/comments/create</span>
+                    <span class="badge auth">AUTH REQUIRED</span>
+                </div>
+                <p class="description">Membuat comment baru</p>
+                <div class="code-block">
+curl -X POST http://127.0.0.1:8000/api/comments/create \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{
+    "post_id": 1,
+    "body": "Great post!"
+  }'
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method put">PUT</span>
+                    <span class="url">/api/comments/update</span>
+                    <span class="badge auth">AUTH REQUIRED</span>
+                </div>
+                <p class="description">Update comment</p>
+                <div class="code-block">
+curl -X PUT http://127.0.0.1:8000/api/comments/update \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{
+    "comment_id": 1,
+    "body": "Updated comment text"
+  }'
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method delete">DELETE</span>
+                    <span class="url">/api/comments/delete</span>
+                    <span class="badge auth">AUTH REQUIRED</span>
+                </div>
+                <p class="description">Hapus comment</p>
+                <div class="code-block">
+curl -X DELETE http://127.0.0.1:8000/api/comments/delete \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{
+    "comment_id": 1
+  }'
+                </div>
+            </div>
+        </div>
+
+        <!-- User Endpoints -->
+        <div class="card">
+            <h2 class="section-title">👤 User Endpoints</h2>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/logout</span>
+                    <span class="badge auth">AUTH REQUIRED</span>
+                </div>
+                <p class="description">Logout dan invalidate token</p>
+                <div class="code-block">
+curl -X GET http://127.0.0.1:8000/api/logout \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-title">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/save_user_info</span>
+                    <span class="badge auth">AUTH REQUIRED</span>
+                </div>
+                <p class="description">Update informasi user</p>
+                <div class="code-block">
+curl -X POST http://127.0.0.1:8000/api/save_user_info \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{
+    "name": "Updated Name",
+    "email": "updated@example.com"
+  }'
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="info-box">
+                <h3>🛠️ Recommended Testing Tools</h3>
+                <ul>
+                    <li><strong>Postman</strong> - Desktop app untuk API testing (https://www.postman.com/)</li>
+                    <li><strong>Thunder Client</strong> - VS Code extension yang ringan</li>
+                    <li><strong>Insomnia</strong> - Alternative untuk Postman</li>
+                    <li><strong>cURL</strong> - Command line tool (sudah tersedia di Windows)</li>
+                    <li><strong>REST Client</strong> - VS Code extension untuk .http files</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
