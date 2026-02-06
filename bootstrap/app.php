@@ -2,6 +2,24 @@
 
 /*
 |--------------------------------------------------------------------------
+| Load Custom Config for InfinityFree Hosting
+|--------------------------------------------------------------------------
+|
+| InfinityFree doesn't support .env files, so we load configuration from
+| config.php file instead. This file should contain all environment variables.
+|
+*/
+
+if (file_exists(__DIR__.'/../config.php')) {
+    $customConfig = require __DIR__.'/../config.php';
+    foreach ($customConfig as $key => $value) {
+        $_ENV[strtoupper($key)] = $value;
+        putenv(strtoupper($key).'='.$value);
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
 | Create The Application
 |--------------------------------------------------------------------------
 |
