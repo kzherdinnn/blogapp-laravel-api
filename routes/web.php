@@ -14,7 +14,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Artisan;
 
 // Route utama
 Route::get('/', function () {
@@ -27,12 +27,24 @@ Auth::routes();
 // Rute menuju home setelah login
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-// DEBUG ROUTE - HAPUS NANTI
+// DEBUG & FIX ROUTE
 Route::get('/debug-images', function() {
     $results = [];
 
-    // 1. Cek Folder Public Storage Link
+    // 1. Cek & FIX Link secara manual jika tidak ada
     $publicStorage = public_path('storage');
+    // Coba Jalankan Artisan Command langsung di sini
+    try {
+        if (!file_exists($publicStorage)) {
+             Artisan::call('storage:link');
+             $results['artisan_storage_link_output'] = Artisan::output();
+        } else {
+            $results['artisan_storage_link_output'] = 'Link already exists (or something exists there)';
+        }
+    } catch (\Exception $e) {
+        $results['artisan_error'] = $e->getMessage();
+    }
+
     $results['public_storage_path'] = $publicStorage;
     $results['public_storage_exists'] = file_exists($publicStorage);
     $results['public_storage_is_link'] = is_link($publicStorage);
@@ -49,9 +61,6 @@ Route::get('/debug-images', function() {
     } else {
         $results['files_in_posts'] = 'Folder not found';
     }
-
-    // 4. Cek Permission
-    $results['storage_perms'] = substr(sprintf('%o', fileperms(storage_path('app/public'))), -4);
 
     return response()->json($results);
 });
