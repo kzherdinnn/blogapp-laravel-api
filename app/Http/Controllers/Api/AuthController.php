@@ -8,6 +8,7 @@ use App\User;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -92,16 +93,10 @@ class AuthController extends Controller
             
             //check if user provided photo
             if($request->photo && $request->photo != ''){
-                // Create storage/profiles directory if it doesn't exist
-                $profilesPath = storage_path('app/public/profiles');
-                if (!file_exists($profilesPath)) {
-                    mkdir($profilesPath, 0755, true);
-                }
-
                 // user time for photo name to prevent name duplication
                 $photo = time().'.jpg';
-                // decode photo string and save to storage/profiles
-                file_put_contents($profilesPath.'/'.$photo, base64_decode($request->photo));
+                // save to storage/profiles via public disk
+                Storage::disk('public')->put('profiles/' . $photo, base64_decode($request->photo));
                 $user->photo = $photo;
             }
 

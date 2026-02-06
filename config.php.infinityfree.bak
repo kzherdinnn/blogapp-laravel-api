@@ -1,0 +1,50 @@
+<?php
+/**
+ * Configuration file untuk InfinityFree Hosting
+ * File ini menggantikan .env untuk hosting yang tidak mendukung .env
+ * 
+ * INSTRUKSI PENTING:
+ * 1. Ganti nilai database (db_host, db_database, db_username, db_password) dengan kredensial InfinityFree Anda
+ * 2. Ganti app_url dengan domain InfinityFree Anda
+ * 3. Upload file ini ke root folder hosting
+ * 4. JANGAN commit file ini ke Git!
+ */
+
+return [
+    // Application Settings
+    'app_name' => 'Blog API',
+    'app_env' => 'production',
+    'app_debug' => false, // HARUS false di production untuk keamanan!
+    'app_url' => 'http://your-domain.infinityfreeapp.com', // ⚠️ GANTI dengan domain Anda!
+    'app_key' => 'base64:yDO7W8M06QNxU3c1KF4RjCivmeMq54w3oYFJF0lz/Wg=', // Sudah diisi dari .env lokal
+    
+    // Database Settings - ⚠️ GANTI SEMUA NILAI INI!
+    'db_connection' => 'mysql',
+    'db_host' => 'sql123.infinityfree.com', // ⚠️ GANTI dengan MySQL hostname dari InfinityFree
+    'db_port' => '3306',
+    'db_database' => 'if0_12345678_blogapi', // ⚠️ GANTI dengan nama database Anda
+    'db_username' => 'if0_12345678', // ⚠️ GANTI dengan username database Anda
+    'db_password' => 'your_database_password', // ⚠️ GANTI dengan password database Anda
+    
+    // JWT Settings - Sudah diisi dari .env lokal
+    'jwt_secret' => 'Ue2rV2B20eRyKjyQ6xoSkXiq5Ok532JqRjX49xuVZE89ysYigh81L5BEsXi1WUQU',
+    'jwt_ttl' => 60, // Token expiration time in minutes
+    'jwt_refresh_ttl' => 20160, // Refresh token expiration time in minutes
+    
+    // CORS Settings
+    'cors_allowed_origins' => '*', // Atau ganti dengan domain frontend Anda jika ada
+    
+    // Session Settings
+    'session_driver' => 'file',
+    'session_lifetime' => 120,
+    
+    // Cache Settings
+    'cache_driver' => 'file',
+    
+    // Queue Settings
+    'queue_connection' => 'sync',
+    
+    // Log Settings
+    'log_channel' => 'stack',
+    'log_level' => 'error', // Hanya log error di production
+];

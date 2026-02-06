@@ -22,7 +22,7 @@ class PostsController extends Controller
             $photo = time() . '.jpg';
             
             // Store photo in 'public/posts' folder
-            $path = Storage::put('public/posts/' . $photo, base64_decode($request->photo));
+            Storage::disk('public')->put('posts/' . $photo, base64_decode($request->photo));
             
             // Set the photo filename in the post
             $post->photo = $photo;
@@ -93,7 +93,7 @@ class PostsController extends Controller
     
         // Check if post has a photo to delete
         if ($post->photo != '') {
-            Storage::delete('public/posts/' . $post->photo);
+            Storage::disk('public')->delete('posts/' . $post->photo);
         }
     
         $post->delete();
