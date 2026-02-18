@@ -5,17 +5,34 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
 Route::get('test-storage', function() {
+    $target = storage_path('app/public');
+    $shortcut = public_path('storage');
+    
+    $message = "Status check";
+    if (!file_exists($shortcut)) {
+        try {
+            // Coba buat symlink lewat PHP jika belum ada
+            symlink($target, $shortcut);
+            $message = "Symlink created successfully!";
+        } catch (\Exception $e) {
+            $message = "Error creating symlink: " . $e->getMessage();
+        }
+    }
+
     $files = Storage::disk('public')->allFiles();
-    $publicStorageExists = file_exists(public_path('storage'));
-    $linkTarget = $publicStorageExists && is_link(public_path('storage')) ? readlink(public_path('storage')) : 'not a symlink';
+    $publicStorageExists = file_exists($shortcut);
+    $isLink = is_link($shortcut);
+    $linkTarget = $isLink ? readlink($shortcut) : 'not a symlink';
     
     return response()->json([
+        'message' => $message,
         'files_count' => count($files),
         'files_list' => array_slice($files, 0, 10),
         'public_storage_exists' => $publicStorageExists,
+        'is_link' => $isLink,
         'link_target' => $linkTarget,
         'public_path' => public_path(),
-        'storage_path' => storage_path('app/public'),
+        'storage_path' => $target,
     ]);
 });
 
