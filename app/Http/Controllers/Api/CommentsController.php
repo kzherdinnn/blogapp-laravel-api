@@ -26,19 +26,29 @@ class CommentsController extends Controller
 
     public function update(Request $request){
         $comment = Comment::find($request->id);
-        //check if user is editing his own comment
-        if($comment->id != Auth::user()->id){
+
+        if (!$comment) {
             return response()->json([
                 'success' => false,
-                'message' => 'unauthorize access'
+                'message' => 'Comment not found'
             ]);
         }
+
+        // check if user is editing his own comment
+        if($comment->user_id != Auth::user()->id){
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access'
+            ]);
+        }
+
         $comment->comment = $request->comment;
         $comment->update();
 
         return response()->json([
             'success' => true,
-            'message' => 'comment edited'
+            'message' => 'Comment edited successfully',
+            'comment' => $comment
         ]);
     }
 
