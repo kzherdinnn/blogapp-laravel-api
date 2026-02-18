@@ -2,6 +2,22 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+
+Route::get('test-storage', function() {
+    $files = Storage::disk('public')->allFiles();
+    $publicStorageExists = file_exists(public_path('storage'));
+    $linkTarget = $publicStorageExists && is_link(public_path('storage')) ? readlink(public_path('storage')) : 'not a symlink';
+    
+    return response()->json([
+        'files_count' => count($files),
+        'files_list' => array_slice($files, 0, 10),
+        'public_storage_exists' => $publicStorageExists,
+        'link_target' => $linkTarget,
+        'public_path' => public_path(),
+        'storage_path' => storage_path('app/public'),
+    ]);
+});
 
 /*
 |--------------------------------------------------------------------------
