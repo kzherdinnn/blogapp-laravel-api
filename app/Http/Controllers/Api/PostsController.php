@@ -38,9 +38,9 @@ class PostsController extends Controller
     private function uploadToCloudinary($base64Data, $folder)
     {
         try {
-            $cloudName = env('CLOUDINARY_CLOUD_NAME');
-            $apiKey    = env('CLOUDINARY_API_KEY');
-            $apiSecret = env('CLOUDINARY_API_SECRET');
+            $cloudName = config('cloudinary.cloud_name');
+            $apiKey    = config('cloudinary.api_key');
+            $apiSecret = config('cloudinary.api_secret');
 
             \Log::error('[Cloudinary Posts] Starting upload', [
                 'folder'     => $folder,

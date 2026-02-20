@@ -128,9 +128,9 @@ class AuthController extends Controller
     private function uploadToCloudinary($base64Data, $folder)
     {
         try {
-            $cloudName = env('CLOUDINARY_CLOUD_NAME');
-            $apiKey    = env('CLOUDINARY_API_KEY');
-            $apiSecret = env('CLOUDINARY_API_SECRET');
+            $cloudName = config('cloudinary.cloud_name');
+            $apiKey    = config('cloudinary.api_key');
+            $apiSecret = config('cloudinary.api_secret');
 
             // Debug: log credential info (bukan secret-nya)
             \Log::error('[Cloudinary] Starting upload', [
