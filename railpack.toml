@@ -1,0 +1,5 @@
+[build]
+buildCmd = ""
+
+[deploy]
+startCmd = "bash start.sh"

@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Cache config at runtime (so env variables are available)
+php artisan config:cache
+php artisan event:cache
+php artisan route:cache
+php artisan view:cache
+
 # Run database migrations
 php artisan migrate --force
 
