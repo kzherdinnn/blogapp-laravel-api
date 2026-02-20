@@ -42,6 +42,14 @@ class PostsController extends Controller
             $apiKey    = env('CLOUDINARY_API_KEY');
             $apiSecret = env('CLOUDINARY_API_SECRET');
 
+            \Log::info('[Cloudinary Posts] Starting upload', [
+                'folder'     => $folder,
+                'cloud_name' => $cloudName,
+                'has_key'    => !empty($apiKey),
+                'has_secret' => !empty($apiSecret),
+                'data_length'=> strlen($base64Data ?? ''),
+            ]);
+
             $timestamp = time();
             $params    = "folder={$folder}&timestamp={$timestamp}{$apiSecret}";
             $signature = sha1($params);
@@ -59,12 +67,24 @@ class PostsController extends Controller
             ]);
 
             $response = curl_exec($ch);
+            $curlError = curl_error($ch);
             curl_close($ch);
 
+            \Log::info('[Cloudinary Posts] Response', [
+                'curl_error' => $curlError,
+                'response'   => $response,
+            ]);
+
             $result = json_decode($response, true);
-            return $result['secure_url'] ?? null;
+            $url = $result['secure_url'] ?? null;
+
+            if (!$url) {
+                \Log::error('[Cloudinary Posts] No secure_url', ['result' => $result]);
+            }
+
+            return $url;
         } catch (\Exception $e) {
-            \Log::error('Cloudinary upload failed: ' . $e->getMessage());
+            \Log::error('[Cloudinary Posts] Exception: ' . $e->getMessage());
             return null;
         }
     }

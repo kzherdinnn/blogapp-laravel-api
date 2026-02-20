@@ -132,6 +132,15 @@ class AuthController extends Controller
             $apiKey    = env('CLOUDINARY_API_KEY');
             $apiSecret = env('CLOUDINARY_API_SECRET');
 
+            // Debug: log credential info (bukan secret-nya)
+            \Log::info('[Cloudinary] Starting upload', [
+                'folder'     => $folder,
+                'cloud_name' => $cloudName,
+                'has_key'    => !empty($apiKey),
+                'has_secret' => !empty($apiSecret),
+                'data_length'=> strlen($base64Data ?? ''),
+            ]);
+
             $timestamp = time();
             $params    = "folder={$folder}&timestamp={$timestamp}{$apiSecret}";
             $signature = sha1($params);
@@ -149,12 +158,25 @@ class AuthController extends Controller
             ]);
 
             $response = curl_exec($ch);
+            $curlError = curl_error($ch);
             curl_close($ch);
 
+            // Debug: log raw response dari Cloudinary
+            \Log::info('[Cloudinary] Response', [
+                'curl_error' => $curlError,
+                'response'   => $response,
+            ]);
+
             $result = json_decode($response, true);
-            return $result['secure_url'] ?? null;
+            $url = $result['secure_url'] ?? null;
+
+            if (!$url) {
+                \Log::error('[Cloudinary] No secure_url in response', ['result' => $result]);
+            }
+
+            return $url;
         } catch (\Exception $e) {
-            \Log::error('Cloudinary upload failed: ' . $e->getMessage());
+            \Log::error('[Cloudinary] Exception: ' . $e->getMessage());
             return null;
         }
     }
