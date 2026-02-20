@@ -133,7 +133,7 @@ class AuthController extends Controller
             $apiSecret = env('CLOUDINARY_API_SECRET');
 
             // Debug: log credential info (bukan secret-nya)
-            \Log::info('[Cloudinary] Starting upload', [
+            \Log::error('[Cloudinary] Starting upload', [
                 'folder'     => $folder,
                 'cloud_name' => $cloudName,
                 'has_key'    => !empty($apiKey),
@@ -162,7 +162,7 @@ class AuthController extends Controller
             curl_close($ch);
 
             // Debug: log raw response dari Cloudinary
-            \Log::info('[Cloudinary] Response', [
+            \Log::error('[Cloudinary] Response', [
                 'curl_error' => $curlError,
                 'response'   => $response,
             ]);

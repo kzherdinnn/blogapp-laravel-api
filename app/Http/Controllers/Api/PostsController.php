@@ -42,7 +42,7 @@ class PostsController extends Controller
             $apiKey    = env('CLOUDINARY_API_KEY');
             $apiSecret = env('CLOUDINARY_API_SECRET');
 
-            \Log::info('[Cloudinary Posts] Starting upload', [
+            \Log::error('[Cloudinary Posts] Starting upload', [
                 'folder'     => $folder,
                 'cloud_name' => $cloudName,
                 'has_key'    => !empty($apiKey),
@@ -70,7 +70,7 @@ class PostsController extends Controller
             $curlError = curl_error($ch);
             curl_close($ch);
 
-            \Log::info('[Cloudinary Posts] Response', [
+            \Log::error('[Cloudinary Posts] Response', [
                 'curl_error' => $curlError,
                 'response'   => $response,
             ]);
