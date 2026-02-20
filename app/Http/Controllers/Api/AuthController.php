@@ -8,7 +8,6 @@ use App\User;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -93,11 +92,11 @@ class AuthController extends Controller
             
             //check if user provided photo
             if($request->photo && $request->photo != ''){
-                // user time for photo name to prevent name duplication
-                $photo = time().'.jpg';
-                // save to storage/profiles via public disk
-                Storage::disk('public')->put('profiles/' . $photo, base64_decode($request->photo));
-                $user->photo = $photo;
+                $photoUrl = $this->uploadToCloudinary($request->photo, 'profiles');
+                if ($photoUrl) {
+                    $user->photo = $photoUrl;
+                    $photo = $photoUrl;
+                }
             }
 
             $user->save();
@@ -123,5 +122,41 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Upload base64 image to Cloudinary and return the secure URL
+     */
+    private function uploadToCloudinary($base64Data, $folder)
+    {
+        try {
+            $cloudName = env('CLOUDINARY_CLOUD_NAME');
+            $apiKey    = env('CLOUDINARY_API_KEY');
+            $apiSecret = env('CLOUDINARY_API_SECRET');
+
+            $timestamp = time();
+            $params    = "folder={$folder}&timestamp={$timestamp}{$apiSecret}";
+            $signature = sha1($params);
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://api.cloudinary.com/v1_1/{$cloudName}/image/upload");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, [
+                'file'      => "data:image/jpeg;base64,{$base64Data}",
+                'api_key'   => $apiKey,
+                'timestamp' => $timestamp,
+                'folder'    => $folder,
+                'signature' => $signature,
+            ]);
+
+            $response = curl_exec($ch);
+            curl_close($ch);
+
+            $result = json_decode($response, true);
+            return $result['secure_url'] ?? null;
+        } catch (\Exception $e) {
+            \Log::error('Cloudinary upload failed: ' . $e->getMessage());
+            return null;
+        }
+    }
 
 }
