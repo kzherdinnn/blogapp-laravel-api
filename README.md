@@ -13,7 +13,7 @@
 **Backend REST API untuk Blog App — mendukung autentikasi JWT, manajemen post, komentar, like, dan upload gambar ke Cloudinary.**  
 *Dikonsumsi oleh [Blog App Android](https://github.com/kzherdinnn/blogapp-android-app) sebagai mobile client.*
 
-🌐 **Live API:** `https://blogapp-laravel-api-production.up.railway.app`
+🌐 **Live API:** `https://blogapp.api.onesite.my.id`
 
 </div>
 
